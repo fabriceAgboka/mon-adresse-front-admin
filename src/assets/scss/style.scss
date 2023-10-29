@@ -1,0 +1,37 @@
+/*================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+
+.navigation.navigation-main{
+    padding-top: 20%;
+}
+
+.navigation.navigation-main.nav-item{
+    font: normal normal medium 24px/35px Poppins;
+    color: #232323;
+    margin-bottom: 10%;
+}
+
+.feather{
+    color: #305557FF;
+    font-size: 10px !important;
+}
+
+.menu-libelle-header{
+    font: normal normal medium 32px/48px Poppins;
+    letter-spacing: 3.2px;
+    color: #305557FF;
+    font-weight: bold;
+    margin-left: 12%;
+    margin-bottom: 10%;
+}
+
+
+
+.badge-light-success{
+    background-color: #305557FF;
+}
