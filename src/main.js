@@ -20,6 +20,12 @@ Vue.use(ModalPlugin)
 // Composition API
 Vue.use(VueCompositionAPI)
 
+// apex chart 
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+
+Vue.component('apexchart', VueApexCharts)
+
 // import core styles
 require('@core/scss/core.scss')
 

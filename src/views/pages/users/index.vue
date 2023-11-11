@@ -1,60 +1,6 @@
 <template>
   <div>
     <h2 style="color: black">Liste des utilisateurs</h2>
-    <b-button
-      v-ripple.400="'rgba(113, 102, 240, 0.15)'"
-      v-b-modal.add-admin-modal
-      variant="outline-primary"
-    >
-      Ajouter
-    </b-button>
-
-    <b-modal
-      id="add-admin-modal"
-      cancel-variant="outline-danger"
-      ok-title="Ajouter"
-      cancel-title="Fermer"
-      centered
-      title="Nouvel administrateur"
-      hide-footer
-    >
-      <b-form>
-        <b-form-group>
-          <label for="email">Email:</label>
-          <b-form-input
-            id="email"
-            type="email"
-            v-model="entity.email"
-            placeholder="Addresse email de l'utilisateur"
-          />
-          <small v-if="errors.email" class="text-danger">{{
-            errors.email[0]
-          }}</small>
-        </b-form-group>
-
-        <div class="demo-inline-spacing justify-content-end" :align="'right'">
-          <b-button
-            @click="closed()"
-            :disabled="disabled"
-            :align="'right'"
-            v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-            variant="outline-primary"
-          >
-            Quitter
-          </b-button>
-
-          <b-button
-            :align="'right'"
-            :disabled="disabled"
-            v-ripple.400="'rgba(255, 255, 255, 0.15)'"
-            @click="store()"
-            variant="primary"
-          >
-            Valider
-          </b-button>
-        </div>
-      </b-form>
-    </b-modal>
 
     <div class="card mt-2">
       <div class="m-2" v-if="loading == true">
@@ -283,8 +229,8 @@ export default {
           sortable: true,
         },
         {
-          key: "type",
-          label: "Type",
+          key: "telephone",
+          label: "Telephone",
           sortable: true,
         },
         {
@@ -341,9 +287,10 @@ export default {
       this.loading = false;
       let form = {
         status: 3,
+        type: "user",
       };
       this.$http
-        .get("/admin/admins", form)
+        .get("/admin/admins?type=user", form)
         .then((res) => {
           this.items = res.data;
           this.totalRows = this.items.length;

@@ -13,7 +13,7 @@
     @mouseleave="updateMouseHovered(false)"
   >
     <!-- main menu header-->
-    <div class="navbar-header expanded" style="background-color: #305557ff">
+    <div class="navbar-header expanded" style="background-color: #014612">
       <slot
         name="header"
         :toggleVerticalMenuActive="toggleVerticalMenuActive"

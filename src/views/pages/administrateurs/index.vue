@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h2 style="color: black">Liste des sociétés</h2>
+    <h2 style="color: black">Liste des administrateurs</h2>
     <b-button
       v-ripple.400="'rgba(113, 102, 240, 0.15)'"
       v-b-modal.add-admin-modal
       variant="outline-primary"
     >
-      Nouvelle sociéte
+      Ajouter
     </b-button>
 
     <b-modal
@@ -15,23 +15,10 @@
       ok-title="Ajouter"
       cancel-title="Fermer"
       centered
-      title="Nouvelle société"
+      title="Nouvel administrateur"
       hide-footer
     >
       <b-form>
-        <b-form-group>
-          <label for="name">Nom:</label>
-          <b-form-input
-            id="name"
-            type="text"
-            v-model="entity.name"
-            placeholder="Nom de la société"
-          />
-          <small v-if="errors.name" class="text-danger">{{
-            errors.name[0]
-          }}</small>
-        </b-form-group>
-
         <b-form-group>
           <label for="email">Email:</label>
           <b-form-input
@@ -42,32 +29,6 @@
           />
           <small v-if="errors.email" class="text-danger">{{
             errors.email[0]
-          }}</small>
-        </b-form-group>
-
-        <b-form-group>
-          <label for="phone">Téléphone:</label>
-          <b-form-input
-            id="phone"
-            type="text"
-            v-model="entity.phone"
-            placeholder="Téléphone de la société"
-          />
-          <small v-if="errors.phone" class="text-danger">{{
-            errors.phone[0]
-          }}</small>
-        </b-form-group>
-
-        <b-form-group>
-          <label for="adresse">Adresse:</label>
-          <b-form-input
-            id="adresse"
-            type="text"
-            v-model="entity.adresse"
-            placeholder="Adresse de la société"
-          />
-          <small v-if="errors.adresse" class="text-danger">{{
-            errors.adresse[0]
           }}</small>
         </b-form-group>
 
@@ -183,14 +144,14 @@
               :filter-included-fields="filterOn"
               @filtered="onFiltered"
             >
-              <template #cell(name)="data">
+              <template #cell(fullname)="data">
                 <b-link
                   class="ml-25"
                   :to="{
-                    name: 'societes_adresses',
+                    name: 'users_adresses',
                     params: { id: data.item.id },
                   }"
-                  >{{ data.item.name }}
+                  >{{ data.item.fullname }}
                 </b-link>
               </template>
 
@@ -218,15 +179,7 @@
                           icon="CloseIcon"
                           class="mr-50 text-success"
                         />
-                        <span>Suspendre</span>
-                      </b-dropdown-item>
-
-                      <b-dropdown-item @click="destroy(data.item.id)">
-                        <feather-icon
-                          icon="CloseIcon"
-                          class="mr-50 text-success"
-                        />
-                        <span>Modifier</span>
+                        <span>Bloquer</span>
                       </b-dropdown-item>
                     </b-dropdown>
                   </span>
@@ -325,23 +278,18 @@ export default {
       },
       fields: [
         {
-          key: "name",
-          label: "Nom",
+          key: "fullname",
+          label: "Nom complet",
           sortable: true,
         },
         {
           key: "telephone",
-          label: "Téléphone",
+          label: "Telephone",
           sortable: true,
         },
         {
           key: "email",
           label: "Email",
-          sortable: true,
-        },
-        {
-          key: "adresse",
-          label: "Adresse",
           sortable: true,
         },
         {
@@ -393,9 +341,10 @@ export default {
       this.loading = false;
       let form = {
         status: 3,
+        type: "admin",
       };
       this.$http
-        .get("/admin/societes", form)
+        .get("/admin/admins?type=admin", form)
         .then((res) => {
           this.items = res.data;
           this.totalRows = this.items.length;
@@ -455,7 +404,7 @@ export default {
       this.disabled = true;
       console.log("store");
       this.$http
-        .post("admin/societes", this.entity)
+        .post("societe/admins", this.entity)
         .then((res) => {
           this.closed();
           this.index();

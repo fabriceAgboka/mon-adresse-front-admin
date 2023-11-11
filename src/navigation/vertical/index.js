@@ -31,6 +31,10 @@ export default [{
     route: 'users',
     icon: 'UserIcon',
   }, {
+    title: 'Administrateurs',
+    route: 'administrateurs',
+    icon: 'UserIcon',
+  }, {
     title: 'Sociétés',
     route: 'societes',
     icon: 'UserIcon',

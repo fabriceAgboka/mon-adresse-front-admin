@@ -56,6 +56,9 @@
                 <small v-if="errors.password" class="text-danger">{{
                   errors.password[0]
                 }}</small>
+                <small v-if="errors_message" class="text-danger">{{
+                  errors_message
+                }}</small>
               </b-form-group>
 
               <!-- submit buttons -->
@@ -122,6 +125,7 @@ export default {
       // validation rulesimport store from '@/store/index'
       required,
       email,
+      errors_message: "",
 
       app: {
         api_url: "/login",
@@ -144,26 +148,34 @@ export default {
     },
   },
   methods: {
-    login() {
+    async login() {
       console.log("login");
       this.disabled = true;
-      this.$http
+      this.errors_message = "";
+      await this.$http
         .post("/login", this.form)
         .then((response) => {
           console.log("done");
           let donnee = response.data;
-          auth.authenticate(donnee);
+          if (donnee.user.type == "admin") {
+            auth.authenticate(donnee);
 
-          this.$toast({
-            component: ToastificationContent,
-            props: {
-              title: "Bienvenue sur MON ADRESSE " + donnee.user.prenom + "!",
-              icon: "UserIcon",
-              variant: "success",
-            },
-          });
+            this.$toast({
+              component: ToastificationContent,
+              props: {
+                title: "Bienvenue sur MON ADRESSE " + donnee.user.prenom + "!",
+                icon: "UserIcon",
+                variant: "success",
+              },
+            });
 
-          this.$router.push("/");
+            this.$router.push("/");
+            // window.location.reload();
+            window.location.href = "/";
+          } else {
+            this.disabled = false;
+            this.errors_message = "Parametre invalide";
+          }
         })
         .catch((errors) => {
           this.disabled = false;

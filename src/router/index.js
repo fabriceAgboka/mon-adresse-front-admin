@@ -108,6 +108,18 @@ const router = new VueRouter({
         }, ],
       },
     }, {
+      path: '/administrateurs',
+      name: 'administrateurs',
+      component: () => import('@/views/pages/administrateurs/index.vue'),
+      meta: {
+        pageTitle: 'Administrateurs',
+        breadcrumb: [{
+          text: 'administrateurs',
+          active: true,
+        }, ],
+      },
+      beforeEnter: ifAuthenticated,
+    }, {
       path: '/users',
       name: 'users',
       component: () => import('@/views/pages/users/index.vue'),
