@@ -38,6 +38,9 @@
                 <small v-if="errors.email" class="text-danger">{{
                   errors.email[0]
                 }}</small>
+                <small v-if="errors_message" class="text-danger">{{
+                  errors_message
+                }}</small>
               </b-form-group>
 
               <!-- forgot password -->
@@ -55,9 +58,6 @@
                 />
                 <small v-if="errors.password" class="text-danger">{{
                   errors.password[0]
-                }}</small>
-                <small v-if="errors_message" class="text-danger">{{
-                  errors_message
                 }}</small>
               </b-form-group>
 
@@ -174,7 +174,7 @@ export default {
             window.location.href = "/";
           } else {
             this.disabled = false;
-            this.errors_message = "Parametre invalide";
+            this.errors_message = "Email ou mots de passe invalide";
           }
         })
         .catch((errors) => {

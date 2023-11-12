@@ -198,6 +198,13 @@
                 {{ format_date(data.value) }}
               </template>
 
+              <template #cell(online)="data">
+                <b-badge :variant="status[data.item.online]">
+                  <span v-if="data.item.online == 0">Encours</span>
+                  <span v-else-if="data.item.online == 1">Valider</span>
+                </b-badge>
+              </template>
+
               <template #cell(id)="data">
                 <span>
                   <span>
@@ -213,20 +220,25 @@
                           class="text-body align-middle mr-25"
                         />
                       </template>
-                      <b-dropdown-item @click="destroy(data.item.id)">
+                      <b-dropdown-item
+                        v-if="data.item.online == 0"
+                        @click="update(data.item.id)"
+                      >
+                        <feather-icon
+                          icon="CloseIcon"
+                          class="mr-50 text-success"
+                        />
+                        <span>Valide</span>
+                      </b-dropdown-item>
+                      <b-dropdown-item
+                        v-else-if="data.item.online == 1"
+                        @click="destroy(data.item.id)"
+                      >
                         <feather-icon
                           icon="CloseIcon"
                           class="mr-50 text-success"
                         />
                         <span>Suspendre</span>
-                      </b-dropdown-item>
-
-                      <b-dropdown-item @click="destroy(data.item.id)">
-                        <feather-icon
-                          icon="CloseIcon"
-                          class="mr-50 text-success"
-                        />
-                        <span>Modifier</span>
                       </b-dropdown-item>
                     </b-dropdown>
                   </span>
@@ -303,6 +315,7 @@ export default {
   },
   data() {
     return {
+      status: ["light-danger", "light-success"],
       disabled: false,
       errors: {},
       entity: {
@@ -342,6 +355,11 @@ export default {
         {
           key: "adresse",
           label: "Adresse",
+          sortable: true,
+        },
+        {
+          key: "online",
+          label: "Status",
           sortable: true,
         },
         {
@@ -408,13 +426,14 @@ export default {
           //errors
         });
     },
-    async destroy(id) {
+
+    async update(id) {
       const result = await Swal.fire({
-        title: "Êtes-vous sûr de vouloir retirer l'utilisateur ?",
+        title: "Êtes-vous sûr de vouloir valider la société ?",
         text: "Cette action est irréversible.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Oui, retirer!",
+        confirmButtonText: "Oui, valider!",
         cancelButtonText: "Annuler",
         reverseButtons: true, // Inverse l'ordre des boutons
         customClass: {
@@ -426,7 +445,7 @@ export default {
 
       if (result.isConfirmed) {
         this.$http
-          .delete("/admin/admins/" + id)
+          .post("/admin/societes/approve/" + id)
           .then((res) => {
             this.index();
             this.$toast({
@@ -446,6 +465,43 @@ export default {
       }
     },
 
+    async destroy(id) {
+      const result = await Swal.fire({
+        title: "Êtes-vous sûr de vouloir suspendre la société ?",
+        text: "Cette action est irréversible.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Oui, suspendre!",
+        cancelButtonText: "Annuler",
+        reverseButtons: true, // Inverse l'ordre des boutons
+        customClass: {
+          confirmButton: "btn btn-primary",
+          cancelButton: "btn btn-outline-danger ml-1 mr-1",
+        },
+        buttonsStyling: false,
+      });
+
+      if (result.isConfirmed) {
+        this.$http
+          .post("/admin/societes/revoke/" + id)
+          .then((res) => {
+            this.index();
+            this.$toast({
+              component: ToastificationContent,
+              props: {
+                title: "Suppression réussie!",
+                icon: "UserIcon",
+                variant: "success",
+              },
+            });
+          })
+          .catch((errors) => {
+            //errors
+          });
+      } else {
+        // code
+      }
+    },
     closed() {
       this.disabled = false;
       this.$bvModal.hide("add-admin-modal");
