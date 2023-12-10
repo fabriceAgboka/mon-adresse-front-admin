@@ -367,6 +367,7 @@ export default {
                 variant: "success",
               },
             });
+            this.index()
           })
           .catch((errors) => {
             //errors
@@ -377,7 +378,7 @@ export default {
     },
 
     format_date(date) {
-      return moment(date).locale("fr").format("LL");
+      return moment(date).locale("fr").format("DD MMM YYYY [à] HH:mm");
     },
   },
 };
