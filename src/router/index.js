@@ -144,6 +144,21 @@ const router = new VueRouter({
       },
       beforeEnter: ifAuthenticated,
     }, {
+      path: '/societes/details/:id',
+      name: 'societe_details',
+      component: () => import('@/views/pages/societes/details.vue'),
+      meta: {
+        pageTitle: 'Détails de la sociétés',
+        breadcrumb: [{
+          text: 'societes',
+          active: false,
+        }, {
+          text: 'details',
+          active: true,
+        }],
+      },
+      beforeEnter: ifAuthenticated,
+    }, {
       path: '/users/:id',
       name: 'users_adresses',
       component: () => import('@/views/pages/users/adresses.vue'),

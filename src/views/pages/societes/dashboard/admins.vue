@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2 style="color: black">Liste des sociétés</h2>
+    <h2 style="color: black">Liste des gérants de la société</h2>
     <div class="card mt-2">
-      <div class="m-2" v-if="loading == true">
+      <div class="m-2">
         <b-row>
           <b-col md="2" sm="4" class="my-1">
             <b-form-group class="mb-0">
@@ -89,26 +89,8 @@
               :filter-included-fields="filterOn"
               @filtered="onFiltered"
             >
-              <template #cell(name)="data">
-                <b-link
-                  class="ml-25"
-                  :to="{
-                    name: 'societes_adresses',
-                    params: { id: data.item.id },
-                  }"
-                  >{{ data.item.name }}
-                </b-link>
-              </template>
-
               <template #cell(created_at)="data">
                 {{ format_date(data.value) }}
-              </template>
-
-              <template #cell(online)="data">
-                <b-badge :variant="status[data.item.online]">
-                  <span v-if="data.item.online == 0">Encours</span>
-                  <span v-else-if="data.item.online == 1">Valider</span>
-                </b-badge>
               </template>
 
               <template #cell(id)="data">
@@ -126,32 +108,12 @@
                           class="text-body align-middle mr-25"
                         />
                       </template>
-                      <b-dropdown-item @click="details(data.item.id)">
+                      <b-dropdown-item @click="destroy(data.item.id)">
                         <feather-icon
                           icon="CloseIcon"
                           class="mr-50 text-success"
                         />
-                        <span>Détails</span>
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        v-if="data.item.online == 0"
-                        @click="update(data.item.id)"
-                      >
-                        <feather-icon
-                          icon="CloseIcon"
-                          class="mr-50 text-success"
-                        />
-                        <span>Valide</span>
-                      </b-dropdown-item>
-                      <b-dropdown-item
-                        v-else-if="data.item.online == 1"
-                        @click="destroy(data.item.id)"
-                      >
-                        <feather-icon
-                          icon="CloseIcon"
-                          class="mr-50 text-success"
-                        />
-                        <span>Suspendre</span>
+                        <span>Retirer</span>
                       </b-dropdown-item>
                     </b-dropdown>
                   </span>
@@ -195,11 +157,8 @@ import {
   BModal,
   VBModal,
   BForm,
-  BLink,
 } from "bootstrap-vue";
 import moment from "moment";
-import Swal from "sweetalert2";
-import ToastificationContent from "@core/components/toastification/ToastificationContent.vue";
 import vSelect from "vue-select";
 import Ripple from "vue-ripple-directive";
 
@@ -224,11 +183,16 @@ export default {
     BForm,
     vSelect,
     Ripple,
-    BLink,
+  },
+  props: {
+    admins: {
+      type: Array,
+      require: true,
+    },
   },
   data() {
     return {
-      status: ["light-danger", "light-success"],
+      items: this.admins,
       disabled: false,
       errors: {},
       entity: {
@@ -237,7 +201,7 @@ export default {
       loading: false,
       perPage: 10,
       pageOptions: [3, 5, 10, 30],
-      totalRows: 1,
+      totalRows: this.admins.length,
       currentPage: 1,
       sortBy: "",
       sortDesc: false,
@@ -251,13 +215,8 @@ export default {
       },
       fields: [
         {
-          key: "name",
-          label: "Nom",
-          sortable: true,
-        },
-        {
-          key: "telephone",
-          label: "Téléphone",
+          key: "fullname",
+          label: "Nom complet",
           sortable: true,
         },
         {
@@ -266,13 +225,8 @@ export default {
           sortable: true,
         },
         {
-          key: "adresse",
-          label: "Adresse",
-          sortable: true,
-        },
-        {
-          key: "online",
-          label: "Status",
+          key: "telephone",
+          label: "Telephone",
           sortable: true,
         },
         {
@@ -298,7 +252,6 @@ export default {
   },
   mounted() {
     // Set the initial number of items
-    this.index();
   },
   directives: {
     "b-modal": VBModal,
@@ -319,135 +272,6 @@ export default {
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-
-    details(id) {
-      this.$router.push("/societes/details/" + id);
-    },
-
-    index() {
-      this.loading = false;
-      let form = {
-        status: 3,
-      };
-      this.$http
-        .get("/admin/societes", form)
-        .then((res) => {
-          this.items = res.data;
-          this.totalRows = this.items.length;
-
-          this.loading = true;
-          this.init_page = true;
-          this.current_page = page;
-        })
-        .catch((errors) => {
-          //errors
-        });
-    },
-
-    async update(id) {
-      const result = await Swal.fire({
-        title: "Êtes-vous sûr de vouloir valider la société ?",
-        text: "Cette action est irréversible.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Oui, valider!",
-        cancelButtonText: "Annuler",
-        reverseButtons: true, // Inverse l'ordre des boutons
-        customClass: {
-          confirmButton: "btn btn-primary",
-          cancelButton: "btn btn-outline-danger ml-1 mr-1",
-        },
-        buttonsStyling: false,
-      });
-
-      if (result.isConfirmed) {
-        this.$http
-          .post("/admin/societes/approve/" + id)
-          .then((res) => {
-            this.index();
-            this.$toast({
-              component: ToastificationContent,
-              props: {
-                title: "Suppression réussie!",
-                icon: "UserIcon",
-                variant: "success",
-              },
-            });
-          })
-          .catch((errors) => {
-            //errors
-          });
-      } else {
-        // code
-      }
-    },
-
-    async destroy(id) {
-      const result = await Swal.fire({
-        title: "Êtes-vous sûr de vouloir suspendre la société ?",
-        text: "Cette action est irréversible.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Oui, suspendre!",
-        cancelButtonText: "Annuler",
-        reverseButtons: true, // Inverse l'ordre des boutons
-        customClass: {
-          confirmButton: "btn btn-primary",
-          cancelButton: "btn btn-outline-danger ml-1 mr-1",
-        },
-        buttonsStyling: false,
-      });
-
-      if (result.isConfirmed) {
-        this.$http
-          .post("/admin/societes/revoke/" + id)
-          .then((res) => {
-            this.index();
-            this.$toast({
-              component: ToastificationContent,
-              props: {
-                title: "Suppression réussie!",
-                icon: "UserIcon",
-                variant: "success",
-              },
-            });
-          })
-          .catch((errors) => {
-            //errors
-          });
-      } else {
-        // code
-      }
-    },
-    closed() {
-      this.disabled = false;
-      this.$bvModal.hide("add-admin-modal");
-    },
-
-    store() {
-      this.disabled = true;
-      console.log("store");
-      this.$http
-        .post("admin/societes", this.entity)
-        .then((res) => {
-          this.closed();
-          this.index();
-          this.$toast({
-            component: ToastificationContent,
-            props: {
-              title: "Ajout réussie!",
-              icon: "UserIcon",
-              variant: "success",
-            },
-          });
-        })
-        .catch((errors) => {
-          this.disabled = false;
-          this.errors = errors.response.data.errors;
-          console.log("error", errors);
-        });
-    },
-
     format_date(date) {
       return moment(date).locale("fr").format("LL");
     },
