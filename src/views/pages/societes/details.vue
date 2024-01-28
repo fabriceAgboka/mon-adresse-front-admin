@@ -92,7 +92,7 @@ export default {
     this.$http
       .post("/admin/dashboard/societe", this.form)
       .then((res) => {
-        this.statistics = res.data;
+        this.statistics = res.data.data;
         this.loading = true;
       })
       .catch((errors) => {

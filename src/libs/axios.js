@@ -4,8 +4,8 @@ import Vue from 'vue'
 import axios from 'axios'
 import auth from '../helpers/auth'
 
-axios.defaults.baseURL = 'http://localhost:8000/api/v1'
-// axios.defaults.baseURL = 'https://monadresse.cestlacom.com/api/v1'
+// axios.defaults.baseURL = 'http://localhost:8000/api/v1'
+axios.defaults.baseURL = 'https://monadresse.cestlacom.com/api/v1'
 
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + auth.getSession()
