@@ -182,6 +182,18 @@ const router = new VueRouter({
         }, ],
       },
       beforeEnter: ifAuthenticated,
+    }, {
+      path: '/facturations',
+      name: 'facturations_index',
+      component: () => import('@/views/pages/facturations/index.vue'),
+      meta: {
+        pageTitle: 'Facturations',
+        breadcrumb: [{
+          text: 'facturations',
+          active: true,
+        }, ],
+      },
+      beforeEnter: ifAuthenticated,
     },
     {
       path: '/second-page',

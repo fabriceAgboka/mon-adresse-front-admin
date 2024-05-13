@@ -38,5 +38,9 @@ export default [{
     title: 'Sociétés',
     route: 'societes',
     icon: 'UserIcon',
+  }, {
+    title: 'Facturations',
+    route: 'facturations_index',
+    icon: 'CircleIcon',
   },
 ]

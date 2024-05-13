@@ -38,7 +38,7 @@
         ><span
           class="apexcharts-legend-text"
           style="
-            color: rgb(55, 61, 63);
+            color: #014612 !important;
             font-size: 12px;
             font-weight: 400;
             font-family: Helvetica, Arial, sans-serif;
@@ -76,7 +76,7 @@
         ><span
           class="apexcharts-legend-text"
           style="
-            color: rgb(55, 61, 63);
+            color: #ffa148 !important;
             font-size: 12px;
             font-weight: 400;
             font-family: Helvetica, Arial, sans-serif;
@@ -114,7 +114,7 @@
         ><span
           class="apexcharts-legend-text"
           style="
-            color: rgb(55, 61, 63);
+            color: #de1212 !important;
             font-size: 12px;
             font-weight: 400;
             font-family: Helvetica, Arial, sans-serif;
