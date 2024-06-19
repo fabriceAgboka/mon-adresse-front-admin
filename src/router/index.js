@@ -194,6 +194,18 @@ const router = new VueRouter({
         }, ],
       },
       beforeEnter: ifAuthenticated,
+    }, {
+      path: '/promo',
+      name: 'promo_index',
+      component: () => import('@/views/pages/promo/index.vue'),
+      meta: {
+        pageTitle: 'Code Promo',
+        breadcrumb: [{
+          text: 'promo',
+          active: true,
+        }, ],
+      },
+      beforeEnter: ifAuthenticated,
     },
     {
       path: '/second-page',

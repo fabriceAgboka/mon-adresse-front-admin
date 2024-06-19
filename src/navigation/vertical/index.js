@@ -42,5 +42,9 @@ export default [{
     title: 'Facturations',
     route: 'facturations_index',
     icon: 'CircleIcon',
+  }, {
+    title: 'Code promo',
+    route: 'promo_index',
+    icon: 'CircleIcon',
   },
 ]

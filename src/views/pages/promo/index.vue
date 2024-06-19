@@ -1,7 +1,102 @@
 <template>
   <div>
-    <h2 style="color: black">Historiques des paiements </h2>
+    <h2 style="color: black">Codes promotionnels</h2>
 
+    <b-button
+      v-ripple.400="'rgba(113, 102, 240, 0.15)'"
+      v-b-modal.add-admin-modal
+      variant="outline-primary"
+    >
+      Ajouter
+    </b-button>
+
+    <b-modal
+      id="add-admin-modal"
+      cancel-variant="outline-danger"
+      ok-title="Ajouter"
+      cancel-title="Fermer"
+      centered
+      title="Nouveau code promo"
+      hide-footer
+    >
+      <b-form>
+        <b-form-group>
+          <label for="code">Code:</label>
+          <b-form-input
+            id="code"
+            type="text"
+            v-model="entity.code"
+            placeholder="Code"
+          />
+          <small v-if="errors.code" class="text-danger">{{
+            errors.code[0]
+          }}</small>
+        </b-form-group>
+
+        <b-form-group>
+          <label for="value">Porcentage:</label>
+          <b-form-input
+            id="value"
+            type="number"
+            v-model="entity.value"
+            placeholder="Valeur"
+          />
+          <small v-if="errors.value" class="text-danger">{{
+            errors.value[0]
+          }}</small>
+        </b-form-group>
+
+        <b-form-group>
+          <label for="limit">Limit:</label>
+          <b-form-input
+            id="limit"
+            type="number"
+            v-model="entity.limit"
+            placeholder="Valeur"
+          />
+          <small v-if="errors.limit" class="text-danger">{{
+            errors.limit[0]
+          }}</small>
+        </b-form-group>
+
+        <b-form-group>
+          <label for="expiry_date">Date de fin:</label>
+          <b-form-input
+            id="expiry_date"
+            type="date"
+            v-model="entity.expiry_date"
+            placeholder="Date de fin"
+          />
+          <small v-if="errors.expiry_date" class="text-danger">{{
+            errors.expiry_date[0]
+          }}</small>
+        </b-form-group>
+
+
+        <div class="demo-inline-spacing justify-content-end" :align="'right'">
+          <b-button
+            @click="closed()"
+            :disabled="disabled"
+            :align="'right'"
+            v-ripple.400="'rgba(255, 255, 255, 0.15)'"
+            variant="outline-primary"
+          >
+            Quitter
+          </b-button>
+
+          <b-button
+            :align="'right'"
+            :disabled="disabled"
+            v-ripple.400="'rgba(255, 255, 255, 0.15)'"
+            @click="store()"
+            variant="primary"
+          >
+            Valider
+          </b-button>
+        </div>
+      </b-form>
+    </b-modal>
+    
     <div class="card mt-2">
       <div class="m-2" v-if="loading == true">
         <b-row>
@@ -104,6 +199,10 @@
               <template #cell(created_at)="data">
                 {{ format_date(data.value) }}
               </template>
+
+              <template #cell(expiry_date)="data">
+                {{ format_date(data.expiry_date) }}
+              </template>
             </b-table>
           </b-col>
 
@@ -178,7 +277,11 @@ export default {
       disabled: false,
       errors: {},
       entity: {
-        email: "",
+        code: "",
+        value: 0,
+        limite: 0,
+        expiry_date: '',
+        online: 1
       },
       loading: false,
       perPage: 10,
@@ -194,33 +297,29 @@ export default {
         id: "info-modal",
         title: "",
         content: "",
+        expiry_date: ''
       },
       fields: [
         {
-          key: "id_transaction",
-          label: "ID",
+          key: "code",
+          label: "Code",
           sortable: true,
         },
         {
-          key: "description",
-          label: "Description",
-          sortable: true,
-        },
-        {
-          key: "id",
-          label: "Montant payé",
+          key: "limite",
+          label: "Valeur(%)",
           sortable: true,
         },
         {
           key: "created_at",
-          label: "Payé le",
+          label: "Date création",
           sortable: true,
         },
-        // {
-        //   key: "id",
-        //   label: "Actions",
-        //   sortable: true,
-        // },
+        {
+          key: "expiry_date",
+          label: "Date expiration",
+          sortable: true,
+        }
       ],
     };
   },
@@ -263,7 +362,7 @@ export default {
         type: "user",
       };
       this.$http
-        .get("/admin/transactions", form)
+        .get("/admin/coupons", form)
         .then((res) => {
           this.items = res.data;
           this.totalRows = this.items.length;
@@ -276,13 +375,72 @@ export default {
           //errors
         });
     },
-    
+    async destroy(id) {
+      const result = await Swal.fire({
+        title: "Êtes-vous sûr de vouloir retirer l'utilisateur ?",
+        text: "Cette action est irréversible.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Oui, retirer!",
+        cancelButtonText: "Annuler",
+        reverseButtons: true, // Inverse l'ordre des boutons
+        customClass: {
+          confirmButton: "btn btn-primary",
+          cancelButton: "btn btn-outline-danger ml-1 mr-1",
+        },
+        buttonsStyling: false,
+      });
+
+      if (result.isConfirmed) {
+        this.$http
+          .delete("/admin/admins/" + id)
+          .then((res) => {
+            this.index();
+            this.$toast({
+              component: ToastificationContent,
+              props: {
+                title: "Suppression réussie!",
+                icon: "UserIcon",
+                variant: "success",
+              },
+            });
+          })
+          .catch((errors) => {
+            //errors
+          });
+      } else {
+        // code
+      }
+    },
 
     closed() {
       this.disabled = false;
       this.$bvModal.hide("add-admin-modal");
     },
 
+    store() {
+      this.disabled = true;
+      console.log("store");
+      this.$http
+        .post("admin/coupons", this.entity)
+        .then((res) => {
+          this.closed();
+          this.index();
+          this.$toast({
+            component: ToastificationContent,
+            props: {
+              title: "Ajout réussie!",
+              icon: "UserIcon",
+              variant: "success",
+            },
+          });
+        })
+        .catch((errors) => {
+          this.disabled = false;
+          this.errors = errors.response.data.errors;
+          console.log("error", errors);
+        });
+    },
 
     format_date(date) {
       return moment(date).locale("fr").format("LL");
